@@ -268,7 +268,7 @@ void draw() {
           start.highlightcolor = green;
         start.display();
         
-        textSize(textSize);
+        textSize(myTextSize);
         fill(225);
         textAlign(CENTER);
         text("START",1180,532 + 20);
@@ -355,7 +355,7 @@ CircleButton selectedSetting = new CircleButton(1180, 266 ,100, saffron, offWhit
 CircleButton selectedTime = new CircleButton(1180, 399, 100, saffron, offWhite);
 
 String[] selected = new String[3];
-int textSize = 20;
+int myTextSize = 20;
 void displayCurrent(){
 
   
@@ -367,7 +367,7 @@ void displayCurrent(){
     selectedMode.display();
 
     textFont(f);
-    textSize(textSize);
+    textSize(myTextSize);
     fill(offWhite);
     textAlign(CENTER);
     selected[0] = "" + currentSetting.mode;
@@ -381,7 +381,7 @@ void displayCurrent(){
     selectedSetting.display();
 
     textFont(f);
-    textSize(textSize);
+    textSize(myTextSize);
     fill(offWhite);
     textAlign(CENTER);
     selected[1] = "" + currentSetting.setting;
@@ -395,7 +395,7 @@ void displayCurrent(){
     selectedTime.display();
 
     textFont(f);
-    textSize(textSize);
+    textSize(myTextSize);
     fill(offWhite);
     textAlign(CENTER);
     selected[2] = "" + currentSetting.hours + "hs" + currentSetting.minutes + "m" + currentSetting.seconds + "s";
