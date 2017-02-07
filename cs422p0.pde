@@ -7,12 +7,12 @@
 
 // the external sound library (Sketch / Import Library / Sound) will work in processing but not in processing.js
 // uncomment these two lines to get audio in Processing
-import processing.sound.*;
-SoundFile beepSound;
+//import processing.sound.*;
+//SoundFile beepSound;
 
 // here is a processing.js solution from http://aaron-sherwood.com/processingjs/circleSound.html
 // uncomment this line to get audio in Processing.js
-//Audio beepSound = new Audio();
+Audio beepSound = new Audio();
 
 // also note the soundfile needs to be in the data folder for processing and outside that folder for Processing.js
 // sounds are also a bit slowerer to start up in Processing.js
@@ -75,9 +75,9 @@ PFont f;
 void loadSounds(){
   // beep soundfile shortened from http://soundbible.com/2158-Text-Message-Alert-5.html
   //Processing load sound
-  beepSound = new SoundFile(this, "bing.mp3");
+  //beepSound = new SoundFile(this, "bing.mp3");
   // processing.js load sound
-  //beepSound.setAttribute("src","bing.mp3");
+  beepSound.setAttribute("src","bing.mp3");
 }
 
 void playBeep() {
