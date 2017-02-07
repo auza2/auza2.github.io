@@ -12,7 +12,8 @@
 
 // here is a processing.js solution from http://aaron-sherwood.com/processingjs/circleSound.html
 // uncomment this line to get audio in Processing.js
-Audio beepSound = new Audio();
+Audio beepSound = new Audio(); 
+///*******UNCOMMENT BEFORE UPLOADING****///
 
 // also note the soundfile needs to be in the data folder for processing and outside that folder for Processing.js
 // sounds are also a bit slowerer to start up in Processing.js
@@ -36,17 +37,29 @@ int[][] numberButtons = { {topLeftx, topLefty, 100, 100}, {topLeftx+ xdiff, topL
 String[] modeLabels = { "WARM" , "BAKE", "BROIL", "PIZZA" , "TOAST" };
 String[] modeIconNames = { "warmIcon.png" , "bakeIcon.png" , "broilIcon.png" , "pizzaIcon.png", "toastIcon.png"};
 PImage[] modeIcons = new PImage[modeIconNames.length];
-
 PImage inside;
 
 
 toasterOvenSetting currentSetting;
 CircleButton[] modeCircleButtons = new CircleButton[modeIconNames.length];
 CircleButton[] numberPadButtons = new CircleButton[numberButtons.length]; // 0-9, Clear,
+
+CircleButton[] toastButtons = new CircleButton[5];
+CircleButton[] pizzaButtons = new CircleButton[5];
+
+ArrayList quickCook;
+ArrayList quickCookButtons;
+
 CircleButton degree;
 CircleButton start;
 CircleButton save;
 CircleButton stop;
+
+CircleButton Hi;
+CircleButton Low;
+
+CircleButton cancel;
+CircleButton addTen;
 
 String degreeText = "";
 String timerText = "";
@@ -59,6 +72,8 @@ int startSecond = 0;
 int startMinute = 0;
 int startHour = 0;
 int startTime = 0;
+
+
 //////////////// not used
 // Constants
 int mode = -1;
@@ -77,7 +92,7 @@ void loadSounds(){
   //Processing load sound
   //beepSound = new SoundFile(this, "bing.mp3");
   // processing.js load sound
-  beepSound.setAttribute("src","bing.mp3");
+  beepSound.setAttribute("src","bing.mp3");///*******UNCOMMENT BEFORE UPLOADING****///
 }
 
 void playBeep() {
@@ -142,10 +157,58 @@ void setup() {
   save = new CircleButton(1180, 665, 100, offWhite, saffron);
   save.name = "Save to Quick Cook"; 
   
+  cancel = new CircleButton(1180, 532, 100, green, green);
+  cancel.name = "Cancel";
+  addTen = new CircleButton(1180, 665, 100, offWhite, saffron);
+  addTen.name = "+10s"; 
+  
+  Hi = new CircleButton(620, 220, 150, bg, offWhite);
+  Hi.name = "HI";
+  Low = new CircleButton(620, 400, 150, bg, offWhite);
+  Low.name = "LOW"; 
   
   stop = new CircleButton(1280/2, 800/2, 100, offWhite, red);
   stop.name = "stop"; 
   
+  quickCook =  new ArrayList();
+  // toasterOvenSetting(String nme, String mde, String set, int hrs, int min, int sec) 
+  quickCook.add(new toasterOvenSetting("1 Pizza", "PIZZA", "1" , 0 , 2, 0));  // Start by adding one element
+  quickCook.add(new toasterOvenSetting("Medium Toast", "TOAST", "MEDIUM" , 0 , 2, 0));  // Start by adding one element
+  quickCook.add(new toasterOvenSetting("Chicken Tenders", "Bake", "350" , 0 , 2, 0));  // Start by adding one element
+  
+  
+  quickCookButtons = new ArrayList();
+  for( int i = 0 ; i < quickCook.size() ; i++){
+    fill(bg);
+    stroke(offWhite); 
+    CircleButton b = new CircleButton(450 + i*200 , 650 , 150, saffron, offWhite);
+    toasterOvenSetting t = (toasterOvenSetting) quickCook.get(i);
+    b.name = t.name;
+    quickCookButtons.add( b);       
+  }
+  
+  for( int i  = 0; i < 5 ;i ++){
+    pizzaButtons[i] = new CircleButton(100 + i * 200 , 235, 200 , bg ,offWhite);
+    pizzaButtons[i].name = ""+ i;
+    toastButtons[i] = new CircleButton(100 + i * 200 , 235, 200 , bg ,offWhite);
+    toastButtons[i].icon = modeIcons[4];
+    switch(i){
+      case 0: 
+        toastButtons[i].name = "LIGHT";
+        toastButtons[i].basecolor = color(134,93,76);
+        break;
+      case 4: 
+        toastButtons[i].name = "DARK";
+        toastButtons[i].basecolor = color(80,56,45);
+        break;
+      case 1: toastButtons[i].name = "LIGHT-MEDIUM";toastButtons[i].basecolor = color(108,75,61);
+        break;
+      case 2: toastButtons[i].name = "MEDIUM";toastButtons[i].basecolor = color(113,72,55);
+        break;
+      case 3: toastButtons[i].name = "MEDIUM-DARK";toastButtons[i].basecolor = color(102,77,66);
+        break;
+    }
+  }
   inside = loadImage("inside2.png","png");
   inside.loadPixels();
   //for the labels
@@ -157,7 +220,13 @@ void setup() {
 // Run in a loop
 
 void draw() {
+   // show inside
   background(bg);
+  imageMode(CORNER);
+  inside.resize(1100, 800);
+  image(inside, 0 , 0);
+  
+
   strokeWeight( 5 );
   displayCurrent();
   
@@ -186,6 +255,22 @@ void draw() {
             modeCircleButtons[i].icon = modeIcons[i];
             modeIcons[i].resize(100, 100);
             image(modeIcons[i], x , y - 20);
+          }
+          
+          textFont(f);
+          textSize(40);
+          fill(offWhite);
+          textAlign(LEFT);
+          text("Quick Cook: ", 45, 670); // Create space for the icons
+          
+          for( int i = 0 ; i < quickCookButtons.size() ; i++){
+            CircleButton b = (CircleButton)quickCookButtons.get(i);
+            b.display();
+            textFont(f);
+            textSize(20);
+            fill(offWhite);
+            textAlign(CENTER);
+            text(b.name, b.x, b.y); 
           }
         break;
       case 1 : // showing Settings
@@ -223,13 +308,62 @@ void draw() {
 
             break;
           case "BROIL":
-            // Labeling the Mode Buttons  
             textFont(f);
-            textSize(36);
+            textSize(60);
+            fill(offWhite);
+            textAlign(LEFT);
+            text("Choose Temperature", 40, 70); 
+            
+            // Labeling the Mode Buttons 
+            Hi.display();
+            Low.display();
+            
+            textFont(f);
+            textSize(30);
             fill(offWhite);
             textAlign(CENTER);
-            text("Display the settings for broil", 600 ,600); // Create space for the icons
+            text(Hi.name, Hi.x, Hi.y +20); 
+            text(Low.name, Low.x, Low.y +20); 
+            
             break;
+          case "WARM":
+            showView = 2;
+            break;
+          case "TOAST":
+            textFont(f);
+            textSize(60);
+            fill(offWhite);
+            textAlign(LEFT);
+            text("Choose Toastedness", 40, 70); 
+            for( CircleButton b: toastButtons){
+              b.display();
+              textFont(f);
+              textSize(25);
+              fill(offWhite);
+              textAlign(CENTER);
+              text(b.name, b.x, b.y + 50); 
+              
+              imageMode(CENTER);
+              modeIcons[4].resize(100, 100);
+              image(modeIcons[4], b.x ,b. y - 20);
+            }
+            break;
+          case "PIZZA":
+            textFont(f);
+            textSize(60);
+            fill(offWhite);
+            textAlign(LEFT);
+            text("Choose Number of Slices", 40, 70); 
+            for( CircleButton b: pizzaButtons){
+              b.display();
+              textFont(f);
+              textSize(25);
+              fill(offWhite);
+              textAlign(CENTER);
+              text(b.name, b.x, b.y + 50); 
+            }
+            break;
+            
         }
         break;
       case 2 : // showing Timer
@@ -283,6 +417,17 @@ void draw() {
         //int changeInMinutes = (minute() - startMinute);
         //int changeInHours = (hour() - startHour);
         
+        cancel.display();
+        textSize(myTextSize);
+        fill(saffron);
+        textAlign(CENTER);
+        text("CANCEL",cancel.x,cancel.y);
+        addTen.display();
+        textSize(myTextSize);
+        fill(saffron);
+        textAlign(CENTER);
+        text("+10s",addTen.x,addTen.y);
+        
         // show inside
         imageMode(CORNER);
         inside.resize(1100, 800);
@@ -319,6 +464,18 @@ void draw() {
         textAlign(CENTER);
         text(" " + hours + "h" ,320,532 + 20);
         
+        if( !(currentSetting.setting == null)){
+          // Rectangle
+          stroke(offWhite);
+          fill(bg);
+          rectMode(CENTER);
+          rect(640, 542+ 100, 690, 60, 10, 10, 10, 10);
+          
+          textSize(30);
+          fill(225);
+          textAlign(CENTER);
+          text("Current Temp:" + currentSetting.setting ,640,542+ 100);
+        }
         
         break;
      case 5:
@@ -330,7 +487,10 @@ void draw() {
          }
          
          stop.display();
-        
+         textSize(30);
+         fill(bg);
+         textAlign(CENTER);
+         text("DONE" ,stop.x,stop.y+10);
   }  
 }
 
@@ -425,6 +585,19 @@ void mouseReleased() {
             break;
         } 
       }
+      
+      // check if any of the quick buttons were clicked
+      for(int i  = 0 ; i < quickCookButtons.size() ; i++){
+        CircleButton b = (CircleButton) quickCookButtons.get(i);
+        
+        if( b.overCircle(b.x, b.y, 100) ==  true){ // changed radius to 100 for some reason
+            currentSetting = (toasterOvenSetting) quickCook.get(i);
+            showView = 3; // show Start
+            break;
+        } 
+      }
+      
+      
       break;
     case 1 : // showing Settings
       //check if back button was pressed
@@ -443,24 +616,60 @@ void mouseReleased() {
         else
            degree.name = "ºC";
       }
-      
-      for( CircleButton b : numberPadButtons){
-        if( b.overCircle(b.x, b.y, 50) ==  true){ // changed radius to 100 for some reason
-          if(degreeText.equals("0"))
-            degreeText = "";
-            
-          if(b.name == "X"){
-            int temp = parseInt(degreeText );
-            int newTemp = temp/10;
-            degreeText = ""+ newTemp;
-          }else if( b.name == "enter"){
-            currentSetting.setting = degreeText + " " + degree.name;
-            showView = 2;
-          }else{
-            degreeText = degreeText+b.name;
-            break;
+      switch(currentSetting.mode)  {
+        case "BAKE":
+          for( CircleButton b : numberPadButtons){
+            if( b.overCircle(b.x, b.y, 50) ==  true){ // changed radius to 100 for some reason
+              if(degreeText.equals("0"))
+                degreeText = "";
+                
+              if(b.name == "X"){
+                int temp = parseInt(degreeText );
+                int newTemp = temp/10;
+                degreeText = ""+ newTemp;
+              }else if( b.name == "enter"){
+                currentSetting.setting = degreeText + " " + degree.name;
+                showView = 2;
+              }else{
+                degreeText = degreeText+b.name;
+                break;
+              }
+            } 
           }
-        } 
+        case "BROIL":
+          if( Hi.overCircle(Hi.x, Hi.y, 100) ==  true){
+            currentSetting.setting = "HI";
+            showView = 2;
+          }
+          if( Low.overCircle(Low.x, Low.y, 100) ==  true){
+            currentSetting.setting = "LOW";
+            showView = 2;
+          }
+          break;
+        case "TOAST":
+          for( CircleButton b: toastButtons){
+             if( b.overCircle(b.x, b.y, 100) ==  true){
+                currentSetting.setting = b.name;
+                currentSetting.seconds = 10;
+                currentSetting.minutes = 3;
+                currentSetting.hours = 0;
+                showView = 3;
+             }
+            }
+            break;
+         case "PIZZA":
+          for( CircleButton b: pizzaButtons){
+             if( b.overCircle(b.x, b.y, 100) ==  true){
+                currentSetting.setting = b.name;
+                currentSetting.seconds = 10;
+                currentSetting.minutes = 3;
+                currentSetting.hours = 0;
+                showView = 3;
+             }
+            }
+            break;
+        
+            
       }
       // Each setting is different for each mode
       break;
@@ -535,6 +744,12 @@ void mouseReleased() {
       }
       break;
     case 4:
+      if( cancel.overCircle(cancel.x, cancel.y, 50)){
+        showView = 0; // show mode
+      }
+      if( addTen.overCircle(addTen.x, addTen.y, 50)){
+        currentSetting.seconds = currentSetting.seconds + 10;
+      }
       break;
     case 5:
       if( stop.overCircle(stop.x, stop.y, 50)){
